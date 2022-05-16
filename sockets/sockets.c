@@ -81,9 +81,9 @@ void protocoloServidor(SOCKET comm_socket, char sendBuff[], char recvBuff[])
 
 		}
 
-		if (strcmp(recvBuff, "COMANDO 2") == 0)
+		if (strcmp(recvBuff, "COMPRA") == 0)
 		{
-
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 		}
 
 		if (strcmp(recvBuff, "COMANDO 3") == 0)
