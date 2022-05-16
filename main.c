@@ -6,6 +6,7 @@
 #include "properties/properties.h"
 #include "logger/logger.h"
 #include "sqlite3/sqlite3.h"
+#include "sockets/sockets.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +17,6 @@ void menuPlan();
 
 int elegirOpcion();
 int costes();
-void properties();
 
 int beneficio(sqlite3 *db, ListaEntradas l);
 int ingresos(ListaEntradas pEntradas);
@@ -35,16 +35,23 @@ SOCKET s;
 char sendBuff[512];
 char recvBuff[512];
 
+/*
+ * MAIN
+ */
+
 int main(int argc, char *argv[])
 {
 	sqlite3_open("sqlite3/deustoFest.sqlite", &db);
+	establecerConexion(s, sendBuff, recvBuff);
 
 	pCart = &cart;
 
 	menu();
-
-    return 0;
 }
+
+/*
+ * MENU PRINCIPAL
+ */
 
 void menu()
 {
@@ -113,7 +120,7 @@ void menu()
 }
 
 /**
- * Menú Planifificación
+ * FUNCIONES DE PLANIFICACIÓN
  */
 
 void menuPlan()
@@ -180,6 +187,10 @@ void menuPlan()
 
 	} while (op != 5);
 }
+
+/*
+ * OTRAS FUNCIONES
+ */
 
 int elegirOpcion()
 {
