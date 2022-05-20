@@ -1,7 +1,11 @@
 #include "sockets.h"
 
+// #define _WIN32_WINNT 0x0501
 #define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 6000
+#define SERVER_PORT 6001
+
+#include <winsock2.h>
+
 
 void establecerConexion(SOCKET comm_socket, char sendBuff[], char recvBuff[])
 {
