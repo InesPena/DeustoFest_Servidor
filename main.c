@@ -62,6 +62,7 @@ void menu()
 	pCl = &cl;
 
 	do {
+
 		obtenerEntradas(db, &lEntradas);
 		obtenerCartelera(db, pCart);
 
