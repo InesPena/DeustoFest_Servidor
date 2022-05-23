@@ -4,7 +4,6 @@
 #include "puesto/puesto.h"
 
 #include "properties/properties.h"
-#include "logger/logger.h"
 #include "sqlite3/sqlite3.h"
 #include "sockets/sockets.h"
 
@@ -43,9 +42,9 @@ int main(int argc, char *argv[])
 {
 	sqlite3_open("sqlite3/deustoFest.sqlite", &db);
 	establecerConexion(s, sendBuff, recvBuff);
+	protocoloServidor(s, sendBuff, recvBuff);
 
 	pCart = &cart;
-
 	menu();
 }
 

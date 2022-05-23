@@ -1,6 +1,7 @@
 #include "sockets.h"
 #include "../entrada/entrada.h"
 #include "../cliente/cliente.h"
+#include "../sqlite3/sqlite3.h"
 
 // #define _WIN32_WINNT 0x0501
 #define SERVER_IP "127.0.0.1"
@@ -78,10 +79,13 @@ void establecerConexion(SOCKET comm_socket, char sendBuff[], char recvBuff[])
 
 void protocoloServidor(SOCKET comm_socket, char sendBuff[], char recvBuff[])
 {
+	sqlite3 *db;
+	sqlite3_open("sqlite3/deustoFest.sqlite", &db);
+
 	recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 
 	do {
-		if (strcmp(recvBuff, "COMANDO 1") == 0)
+		if (strcmp(recvBuff, "CARTELERA") == 0)
 		{
 
 		}
@@ -89,39 +93,39 @@ void protocoloServidor(SOCKET comm_socket, char sendBuff[], char recvBuff[])
 		if (strcmp(recvBuff, "COMPRA") == 0)
 		{
 			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-
 			int camp = atoi(recvBuff);
 			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 			int bus = atoi (recvBuff);
 			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 			int precio= atoi(recvBuff);
-			int dni = to_string(recvBuff);
-			int nom = recvBuff;
-			int email = recvBuff;
+			char *dni;
+			strcpy(dni, recvBuff);
+			char *nom;
+			strcpy(nom, recvBuff);
+			char *email;
+			strcpy(email, recvBuff);
 
 			Entrada *pEnt;
 			Entrada ent;
 			pEnt = &ent;
 			pEnt->camping = camp;
 			pEnt->bus = bus;
-			pEnt->dni = dni;
+			strcpy(pEnt->dni, dni);
 			pEnt->precio = precio;
 			insertEntrada(db, pEnt);
 
 			Cliente *pCl;
 			Cliente cl;
 			pCl = &cl;
-			pCl->dni = dni;
-			pCl->nombre = nom;
-			pCl->mail = email;
+			strcpy(pCl->dni, dni);
+			strcpy(pCl->nombre, nom);
+			strcpy(pCl->mail, email);
 			insertCliente(db,pCl);
-
-			sprintf(sendBuff, "%s", "Compra completada");
-			send(comm_socket, sendBuff, sizeof(sendBuff), 0);
 		}
 
-		if (strcmp(recvBuff, "COMANDO 3") == 0)
+		if (strcmp(recvBuff, "DEVOLUCION") == 0)
 		{
+			//FUNCION ELIMINAR ENTRADA
 
 		}
 
