@@ -8,7 +8,7 @@ void log(char msg[MAX_LOG], TIPO tipo)
 	fprintf(file, "\n%s", now());
 
 	if (tipo == INFO) fprintf(file, "INFO: ");
-	if (tipo == ERRO) fprintf(file, "ERROR: ");
+	if (tipo == ERROR_) fprintf(file, "ERROR: ");
 
 	fprintf(file, msg);
 

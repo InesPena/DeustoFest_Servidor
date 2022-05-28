@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../sqlite3/sqlite3.h"
-#include "../logger/logger.h"
+#include "../../manager/sqlite3/sqlite3.h"
+#include "../../manager/logger/logger.h"
 #include "../cliente/cliente.h"
 
 #define MAX_ENTRADAS 1000
@@ -38,7 +38,7 @@ float porcentajeAsistencia(sqlite3 *db);
 
 void obtenerEntradas(sqlite3 *db, ListaEntradas *le);
 
-void eliminarEntrada(sqlite3 *db, ListaEntradas *le);
+void eliminarEntrada(sqlite3 *db, ListaEntradas *le, char *dni);
 
 
 #endif /* ENTRADA_ENTRADA_H_ */

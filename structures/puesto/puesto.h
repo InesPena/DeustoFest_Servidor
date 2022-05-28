@@ -1,8 +1,8 @@
 #ifndef PUESTO_PUESTO_H_
 #define PUESTO_PUESTO_H_
 
-#include "../sqlite3/sqlite3.h"
-#include "../logger/logger.h"
+#include "../../manager/sqlite3/sqlite3.h"
+#include "../../manager/logger/logger.h"
 
 #include <stdio.h>
 #include <string.h>

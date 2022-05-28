@@ -1,5 +1,6 @@
-#include "concierto.h"
-#include "../sqlite3/sqlite3.h"
+#include "../concierto/concierto.h"
+
+#include "../../manager/sqlite3/sqlite3.h"
 
 void selectDias(sqlite3 *db);
 void selectEscenarios(sqlite3 *db);
@@ -95,7 +96,7 @@ void insertarConcierto(sqlite3 *db, Concierto *c)
 	sprintf(buffer, "INSERT INTO CONCIERTO (ARTISTA, COD_ESC, COD_DIA, COSTE) VALUES ('%s', %i, %i, %i)", c->artista, c->escenario, c->dia, c->coste);
 
 	if (result != SQLITE_DONE) {
-		log(buffer, ERROR);
+		log(buffer, ERROR_);
 		printf("\nError añadiendo el artista\n");
 
 	} else  {
@@ -126,11 +127,11 @@ void eliminarConcierto(sqlite3 *db, int cod)
 	sprintf(buffer, "DELETE FROM CONCIERTO WHERE COD = %i", cod);
 
 	if (result != SQLITE_DONE){
-		log(buffer, ERROR);
+		log(buffer, ERROR_);
 		printf("Error cancelando concierto\n");
 
 	} else {
-		log(buffer, ERROR);
+		log(buffer, ERROR_);
 		printf("Concierto cancelado correctamente\n");
 	}
 

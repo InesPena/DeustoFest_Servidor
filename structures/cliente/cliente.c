@@ -1,5 +1,5 @@
 #include "cliente.h"
-#include "../sqlite3/sqlite3.h"
+#include "../../manager/sqlite3/sqlite3.h"
 
 #define MAX_LINE 20
 
@@ -135,7 +135,7 @@ void consultarDatosCliente(sqlite3 *db, Cliente *c){
 			"FROM CLIENTE CL, ENTRADA E "
 			"WHERE CLIENTE.DNI=ENTRADA.DNI AND CLIENTE.DNI = '%s'", c->dni);
 
-	if (result != SQLITE_DONE) log(buffer, ERROR);
+	if (result != SQLITE_DONE) log(buffer, ERROR_);
 	else  log(buffer, INFO);
 
 	sqlite3_finalize(stmt);

@@ -1,5 +1,5 @@
 #include "entrada.h"
-#include "../sqlite3/sqlite3.h"
+#include "../../manager/sqlite3/sqlite3.h"
 
 #define PRECIO_CAMP 35
 #define PRECIO_BUS 47
@@ -93,7 +93,7 @@ void insertEntrada(sqlite3 *db, Entrada *e)
 	sprintf(buffer, "INSERT INTO ENTRADA(DNI, CAMPING, BUS, PRECIO) VALUES ('%s', %i, %i, %i)", e->dni, e->camping, e->bus, e->precio);
 
 	if (result != SQLITE_DONE){
-		log(buffer, ERRO);
+		log(buffer, ERROR_);
 		printf("\nError al realizar la compra\n");
 	} else {
 		log(buffer, INFO);
@@ -186,10 +186,12 @@ void Grupo::quitarPersona(Persona * p){ //Recibe un puntero a un objeto persona 
 }
  */
 
-void eliminarEntrada(sqlite3 *db, ListaEntradas *le){
+void eliminarEntrada(sqlite3 *db, ListaEntradas *le, char *dni)
+{
 	sqlite3_stmt *stmt;
 
-	char sql[] = "DELETE FROM ENTRADA WHERE dni=%s", dni;
+	char sql[] = "DELETE FROM ENTRADA WHERE dni=?";
+	sqlite3_bind_text(stmt, 1, dni, strlen(dni), SQLITE_STATIC);
 	sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
 	sqlite3_step(stmt);
 	int pos=0, enc=0;

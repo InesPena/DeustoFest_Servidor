@@ -9,7 +9,9 @@
 #include <time.h>
 typedef enum
 {
-	INFO , ERRO
+	INFO,
+	ERROR_
+
 } TIPO;
 
 void log(char msg[MAX_LOG], TIPO tipo);

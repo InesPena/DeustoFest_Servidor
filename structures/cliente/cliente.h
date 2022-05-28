@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../sqlite3/sqlite3.h"
-#include "../logger/logger.h"
+#include "../../manager/sqlite3/sqlite3.h"
+#include "../../manager/logger/logger.h"
 
 typedef struct{
 
