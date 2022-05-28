@@ -16,6 +16,8 @@ typedef struct{
 
 } Cliente;
 
+void imprimirCliente(Cliente c);
+
 void pedirDatosCliente(Cliente *c);
 
 void insertCliente(sqlite3 *db, Cliente *c);
@@ -24,4 +26,4 @@ void imprimirClientes(sqlite3 *db);
 
 void consultarDatosCliente(sqlite3 *db, Cliente *c);
 
-#endif
+#endif /* CLIENTE_CLIENTE_H_ */

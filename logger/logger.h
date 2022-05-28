@@ -7,12 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
 typedef enum
 {
-	INFO,
-	ERROR
-
+	INFO , ERRO
 } TIPO;
 
 void log(char msg[MAX_LOG], TIPO tipo);

@@ -4,6 +4,16 @@
 #define MAX_LINE 20
 
 /*
+ * Imprime los datos de un cliente
+ */
+
+void imprimirCliente(Cliente c)
+{
+
+
+}
+
+/*
  * Pide los datos de un cliente por pantalla
  */
 
@@ -55,11 +65,6 @@ void insertCliente(sqlite3 *db, Cliente *c)
 
 	sqlite3_finalize(stmt);
 }
-
-/*
- * Saca por pantalla los datos de todos los clientes
- */
-
 void imprimirClientes(sqlite3 *db)
 {
 	sqlite3_stmt *stmt;
@@ -80,7 +85,6 @@ void imprimirClientes(sqlite3 *db)
 
 	sqlite3_finalize(stmt);
 }
-
 void consultarDatosCliente(sqlite3 *db, Cliente *c){
 
 	imprimirClientes(db);
@@ -135,6 +139,7 @@ void consultarDatosCliente(sqlite3 *db, Cliente *c){
 	else  log(buffer, INFO);
 
 	sqlite3_finalize(stmt);
+
 
 }
 

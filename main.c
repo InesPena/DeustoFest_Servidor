@@ -1,226 +1,166 @@
 #include "entrada/entrada.h"
-#include "cliente/cliente.h"
-#include "concierto/concierto.h"
-#include "puesto/puesto.h"
+ #include "cliente/cliente.h"
+ #include "concierto/concierto.h"
+// #include "puesto/puesto.h"
 
-#include "properties/properties.h"
+ #include "properties/properties.h"
 #include "sqlite3/sqlite3.h"
-#include "sockets/sockets.h"
-
+#include "concierto/concierto.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-void menu();
-void menuPlan();
-
-int elegirOpcion();
-int costes();
-
-int beneficio(sqlite3 *db, ListaEntradas l);
-int ingresos(ListaEntradas pEntradas);
-
-sqlite3 *db;
-
-Cartelera *pCart;
-Cartelera cart;
-
-ListaEntradas lEntradas;
-
+#include <winsock2.h>
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
 
-SOCKET s;
-char sendBuff[512];
-char recvBuff[512];
-
-/*
- * MAIN
- */
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+	WSADATA wsaData;
+	SOCKET conn_socket; //el que lleva la conexion
+	SOCKET comm_socket; //el que lo comunica
+	struct sockaddr_in server;
+	struct sockaddr_in client;
+	char sendBuff[512], recvBuff[512]; // lo que yo envio, lo que yo recibo
+	sqlite3 *db;
+	char opcion, conCamping, conBus,opc;
+	Cartelera cart;
+	int i, precio;
+	char dni[10], nom[20], email[50];
 	sqlite3_open("sqlite3/deustoFest.sqlite", &db);
-	establecerConexion(s, sendBuff, recvBuff);
-	protocoloServidor(s, sendBuff, recvBuff);
+	ListaEntradas le;
 
-	pCart = &cart;
-	menu();
-}
-
-/*
- * MENU PRINCIPAL
- */
-
-void menu()
-{
-	int op;
-
-	Cliente *pCl;
-	Cliente cl;
-	pCl = &cl;
-
-	do {
-
-		obtenerEntradas(db, &lEntradas);
-		obtenerCartelera(db, pCart);
-
-		printf("\n\n\tADMINISTRADOR\n");
-		printf("--------------------------------\n\n");
-		printf("1. Planificar Festival\n");
-		printf("2. Consultar programa\n");
-		printf("3. Ver lista de puestos de comida/bebida\n");
-		printf("4. Consultar datos de cliente\n");
-		printf("5. Ver Estadísticas\n");
-		printf("6. Volver atrás\n");
-
-		op = elegirOpcion();
-
-	    switch (op) {
-
-	     	 case 1:
-	     		menuPlan();
-	     		break;
-
-	         case 2:
-	        	 imprimirCartelera(db, pCart, 2);
-	        	 break;
-
-
-	         case 3:
-	        	 imprimirPuesto(db);
-	             break;
-
-	         case 4:
-	        	 printf("\n\nInserte el dni del cliente...\n\n");
-	        	 consultarDatosCliente(db, pCl);
-	        	 break;
-
-	         case 5:
-	        	 printf("\n\tESTADÍSTICAS\n");
-	        	 printf("--------------------------------\n\n");
-	        	 printf("Asistencia = \t\t%.2f%% \n", porcentajeAsistencia(db));
-	        	 printf("Ingreso total = \t%i\n", ingresos(lEntradas));
-	        	 printf("Coste total = \t\t%i\n", costes(db));
-	        	 printf("Beneficio total = \t%i\n", beneficio(db, lEntradas));
-	        	 break;
-
-	         case 6:
-	        	 free(pCl->nombre);
-	        	 free(pCl->mail);
-	        	 free(pCl);
-	         	 break;
-
-	         default:
-	        	 printf("\n¡ERROR! La opción seleccionada no existe\n");
-	        	 break;
-	    }
-
-	} while (op != 6);
-}
-
-/**
- * FUNCIONES DE PLANIFICACIÓN
- */
-
-void menuPlan()
-{
-	int op;
-
-	Concierto *pCon;
-	Concierto con;
-	pCon = &con;
-
-	Puesto *pPu;
-	Puesto pu;
-	pPu = &pu;
-
-	do {
-
-		printf("\n\tPLANIFICAR FESTIVAL\n");
-		printf("--------------------------------\n\n");
-		printf("1. Organizar nuevo concierto\n");
-		printf("2. Cancelar concierto\n");
-		printf("3. Añadir puesto\n");
-		printf("4. Eliminar puesto\n");
-		printf("5. Volver atrás\n");
-
-		op = elegirOpcion();
-
-		switch (op) {
-
-			case 1:
-				printf("\nInserte los siguientes datos...\n\n");
-				pedirDatosConcierto(db, pCon);
-				insertarConcierto(db, pCon);
-				break;
-
-		    case 2:
-		    	obtenerCartelera(db, &cart);
-		    	printf("\nInserte el código del concierto...\n\n");
-		    	eliminarConcierto(db, pedirCodigoConcierto(cart));
-		    	break;
-
-		    case 3:
-		    	printf("\nInserte los siguientes datos...\n\n");
-		    	pedirDatosPuesto(db, pPu);
-		    	insertarPuesto(db, pPu);
-		    	break;
-
-		    case 4:
-		    	printf("\nInserte el código del puesto...\n");
-		    	imprimirPuesto(db);
-		    	eliminarPuesto(db, pedirCodigoPuesto());
-		    	break;
-
-		    case 5:
-		    	free(pCon->artista);
-		    	free(pCon);
-		    	free(pPu->marca);
-		    	free(pPu);
-		    	break;
-
-		    default:
-		    	printf("\n¡ERROR! La opción seleccionada no existe\n");
-		    	break;
-		}
-
-	} while (op != 5);
-}
-
-/*
- * OTRAS FUNCIONES
- */
-
-int elegirOpcion()
-{
-	int op;
-
-	printf("\nOpción: ");
-	fflush(stdout);
-	scanf("%i", &op);
-	getchar();
-
-	return op;
-}
-
-int ingresos(ListaEntradas pEntradas)
-{
-	int ingresos=0;
-
-	for(int i=0; i<pEntradas.numEntradas;i++){
-		ingresos += pEntradas.entradas[i].precio;
+	printf("\nInitialising Winsock...\n"); // inicializa la libreria
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+		printf("Failed. Error Code : %d", WSAGetLastError());
+		return -1;
 	}
 
-	return ingresos;
+	printf("Initialised.\n");
+
+	//SOCKET creation creacion del socket( la primera estructura
+	if ((conn_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+		printf("Could not create socket : %d", WSAGetLastError());
+		WSACleanup();
+		return -1;
+	}
+
+	printf("Socket created.\n");
+	// cual es la ip y cual es el puerto
+	server.sin_addr.s_addr = inet_addr(SERVER_IP); //INADDR_ANY;
+	server.sin_family = AF_INET;
+	server.sin_port = htons(SERVER_PORT);
+
+	//BIND (the IP/port with socket)
+	if (bind(conn_socket, (struct sockaddr*) &server,
+			sizeof(server)) == SOCKET_ERROR) {
+		printf("Bind failed with error code: %d", WSAGetLastError());
+		closesocket(conn_socket);
+		WSACleanup();
+		return -1;
+	}
+
+	printf("Bind done.\n"); //DEJAR EL SOCKET EN ESPERA
+
+	//LISTEN to incoming connections (socket server moves to listening mode)
+	if (listen(conn_socket, 1) == SOCKET_ERROR) {
+		printf("Listen failed with error code: %d", WSAGetLastError());
+		closesocket(conn_socket);
+		WSACleanup();
+		return -1;
+	}
+
+	//ACCEPT incoming connections (server keeps waiting for them)
+	printf("Waiting for incoming connections...\n");
+	int stsize = sizeof(struct sockaddr);
+	comm_socket = accept(conn_socket, (struct sockaddr*) &client, &stsize);
+	// Using comm_socket is able to send/receive data to/from connected client
+	if (comm_socket == INVALID_SOCKET) {
+		printf("accept failed with error code : %d", WSAGetLastError());
+		closesocket(conn_socket);
+		WSACleanup();
+		return -1;
+	}
+	printf("Incomming connection from: %s (%d)\n", inet_ntoa(client.sin_addr),
+			ntohs(client.sin_port));
+
+	// Closing the listening sockets (is not going to be used anymore)
+	closesocket(conn_socket);
+	int fin = 0;
+	do {
+		recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+		sscanf(recvBuff, "%c", &opc);
+		switch(opc){
+		case '1': break;
+		case '2':
+			do{
+				recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+				sscanf(recvBuff, "%c", &opcion);
+				switch (opcion) {
+				case '1':
+					obtenerCartelera(db, &cart);
+					sprintf(sendBuff, "%d", cart.numConciertos);
+					send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+					for (i = 0; i < cart.numConciertos; i++) {
+						sprintf(sendBuff, "%d;%s;%d;%d;%d", cart.conciertos[i].cod,
+								cart.conciertos[i].artista,
+								cart.conciertos[i].escenario, cart.conciertos[i].dia,
+								cart.conciertos[i].coste);
+						send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+					}
+					break;
+				case '2':
+					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+					sscanf(recvBuff, "%c", &conCamping);
+					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+					sscanf(recvBuff, "%c", &conBus);
+					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+					sscanf(recvBuff, "%d", &precio);
+					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+					sprintf(dni, "%s", recvBuff);
+					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+					sprintf(nom, "%s", recvBuff);
+					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+					sprintf(email, "%s", recvBuff);
+					Entrada * pEnt;
+					Entrada ent;
+					pEnt = &ent;
+					pEnt->camping = conCamping;
+					pEnt->bus = conBus;
+					strcpy(pEnt->dni, dni);
+					pEnt->precio = precio;
+					insertEntrada(db, pEnt);
+
+					Cliente cl;
+					Cliente * pcl = &cl;
+					strcpy(pcl->dni, dni);
+					strcpy(pcl->nombre, nom);
+					strcpy(pcl->mail, email);
+					insertCliente(db, pcl);
+					break;
+				case '3':
+					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+					sprintf(dni, "%s", recvBuff);
+					obtenerEntradas(db, &le);
+					printf("Número de entradas: %d\n",le.numEntradas);fflush(stdout);
+					eliminarEntrada(db, &le, dni);
+					sprintf(sendBuff,"Entrada eliminada correctamente");
+					send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+					break;
+				case '4':
+					printf("OPCION : %c\n", opcion);
+					fflush(stdout);
+					break;
+				}
+			}while(opcion!='4');
+			break;
+		case '3': fin=1;
+		}
+	} while (fin == 0);
+
+	// CLOSING the sockets and cleaning Winsock...
+	closesocket(comm_socket);
+	WSACleanup();
+
+	return 0;
+	//-----------------------------------------------------------
 }
 
-int costes(sqlite3 *db)
-{
-	return costesConciertos(db) - costesPuestos(db);
-}
-
-int beneficio(sqlite3 *db, ListaEntradas l)
-{
-	return ingresos(l) - costes(db);
-}

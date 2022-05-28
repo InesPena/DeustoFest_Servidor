@@ -93,7 +93,7 @@ void insertEntrada(sqlite3 *db, Entrada *e)
 	sprintf(buffer, "INSERT INTO ENTRADA(DNI, CAMPING, BUS, PRECIO) VALUES ('%s', %i, %i, %i)", e->dni, e->camping, e->bus, e->precio);
 
 	if (result != SQLITE_DONE){
-		log(buffer, ERROR);
+		log(buffer, ERRO);
 		printf("\nError al realizar la compra\n");
 	} else {
 		log(buffer, INFO);
@@ -152,5 +152,49 @@ void obtenerEntradas(sqlite3 *db, ListaEntradas *le)
 
 	log(sql2, INFO);
 
+	sqlite3_finalize(stmt);
+}
+
+/*
+ * void borrarPersona(sqlite3 *db, int id){
+	sqlite3_stmt *stmt;
+	char sql[100];
+	sprintf(sql, "delete from persona where id = %d",id);
+	sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) ;
+	sqlite3_step(stmt);
+	sqlite3_finalize(stmt);
+}
+
+void Grupo::quitarPersona(Persona * p){ //Recibe un puntero a un objeto persona y elimina esa persona del array
+	//Buscamos la posición del array en la que está la persona
+	int pos=0,enc=0;
+	while(!enc && pos<numPersonas){
+		//if(personas[pos]->getNombre() == p->getNombre()){
+		if(strcmp(personas[pos]->getNombre(), p->getNombre()) == 0){
+			enc = 1;
+		}else{
+			pos++;
+		}
+	}
+	if(enc){
+		//Para borrar el elemento situado en la posición pos, desplazamos el resto de los elementos una posición a la izda
+		for(int i=pos;i<numPersonas-1;i++){
+			personas[i] = personas[i+1];
+		}
+		numPersonas--;
+	}
+}
+ */
+
+void eliminarEntrada(sqlite3 *db, ListaEntradas *le){
+	sqlite3_stmt *stmt;
+
+	char sql[] = "DELETE FROM ENTRADA WHERE dni=%s", dni;
+	sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+	sqlite3_step(stmt);
+	int pos=0, enc=0;
+	while(!enc && pos<le->numEntradas){
+
+	}
 	sqlite3_finalize(stmt);
 }

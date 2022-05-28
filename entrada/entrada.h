@@ -38,5 +38,7 @@ float porcentajeAsistencia(sqlite3 *db);
 
 void obtenerEntradas(sqlite3 *db, ListaEntradas *le);
 
+void eliminarEntrada(sqlite3 *db, ListaEntradas *le);
+
 
 #endif /* ENTRADA_ENTRADA_H_ */
