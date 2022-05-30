@@ -24,11 +24,10 @@ ListaEntradas lEntradas;
  * MAIN
  */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	sqlite3_open("sqlite3/deustoFest.sqlite", &db);
 	pCart = &cart;
-	menu(db, pCart, lEntradas);
+	//menu(db, pCart, lEntradas);
 
 	/*-------------------------- SOCKETS----------------------------------*/
 
@@ -39,7 +38,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in client;
 	char sendBuff[512], recvBuff[512];
 
-	char opcion, conCamping, conBus,opc;
+	char opcion, conCamping, conBus, opc;
 	Cartelera cart;
 	int i, precio;
 	char dni[10], nom[20], email[50];
@@ -94,82 +93,76 @@ int main(int argc, char *argv[])
 
 	closesocket(conn_socket);
 	int fin = 0;
+
 	do {
 		recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 		sscanf(recvBuff, "%c", &opc);
-		switch(opc){
-		case '1': break;
-		case '2':
-			do{
-				recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-				sscanf(recvBuff, "%c", &opcion);
-				switch (opcion) {
-				case '1':
-					obtenerCartelera(db, &cart);
-					sprintf(sendBuff, "%d", cart.numConciertos);
-					send(comm_socket, sendBuff, sizeof(sendBuff), 0);
-					for (i = 0; i < cart.numConciertos; i++) {
-						sprintf(sendBuff, "%d;%s;%d;%d;%d", cart.conciertos[i].cod,
-								cart.conciertos[i].artista,
-								cart.conciertos[i].escenario, cart.conciertos[i].dia,
-								cart.conciertos[i].coste);
-						send(comm_socket, sendBuff, sizeof(sendBuff), 0);
-					}
-					break;
-				case '2':
-					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-					sscanf(recvBuff, "%c", &conCamping);
-					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-					sscanf(recvBuff, "%c", &conBus);
-					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-					sscanf(recvBuff, "%d", &precio);
-					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-					sprintf(dni, "%s", recvBuff);
-					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-					sprintf(nom, "%s", recvBuff);
-					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-					sprintf(email, "%s", recvBuff);
-					Entrada * pEnt;
-					Entrada ent;
-					pEnt = &ent;
-					pEnt->camping = conCamping;
-					pEnt->bus = conBus;
-					strcpy(pEnt->dni, dni);
-					pEnt->precio = precio;
-					insertEntrada(db, pEnt);
 
-					Cliente cl;
-					Cliente * pcl = &cl;
-					strcpy(pcl->dni, dni);
-					strcpy(pcl->nombre, nom);
-					strcpy(pcl->mail, email);
-					insertCliente(db, pcl);
-					break;
-				case '3':
-					recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
-					sprintf(dni, "%s", recvBuff);
-					obtenerEntradas(db, &le);
-					printf("Número de entradas: %d\n",le.numEntradas);fflush(stdout);
-					eliminarEntrada(db, &le, dni);
-					sprintf(sendBuff,"Entrada eliminada correctamente");
-					send(comm_socket, sendBuff, sizeof(sendBuff), 0);
-					break;
-				case '4':
-					printf("OPCION : %c\n", opcion);
-					fflush(stdout);
-					break;
-				}
-			}while(opcion!='4');
+		switch (opcion) {
+		case '1':
+			obtenerCartelera(db, &cart);
+			sprintf(sendBuff, "%d", cart.numConciertos);
+			send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+			for (i = 0; i < cart.numConciertos; i++) {
+				sprintf(sendBuff, "%d;%s;%d;%d;%d", cart.conciertos[i].cod,
+						cart.conciertos[i].artista,
+						cart.conciertos[i].escenario, cart.conciertos[i].dia,
+						cart.conciertos[i].coste);
+				send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+			}
 			break;
-		case '3': fin=1;
+		case '2':
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+			sscanf(recvBuff, "%c", &conCamping);
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+			sscanf(recvBuff, "%c", &conBus);
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+			sscanf(recvBuff, "%d", &precio);
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+			sprintf(dni, "%s", recvBuff);
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+			sprintf(nom, "%s", recvBuff);
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+			sprintf(email, "%s", recvBuff);
+			Entrada *pEnt;
+			Entrada ent;
+			pEnt = &ent;
+			pEnt->camping = conCamping;
+			pEnt->bus = conBus;
+			strcpy(pEnt->dni, dni);
+			pEnt->precio = precio;
+			insertEntrada(db, pEnt);
+
+			Cliente cl;
+			Cliente *pcl = &cl;
+			strcpy(pcl->dni, dni);
+			strcpy(pcl->nombre, nom);
+			strcpy(pcl->mail, email);
+			insertCliente(db, pcl);
+			break;
+		case '3':
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+			sprintf(dni, "%s", recvBuff);
+			obtenerEntradas(db, &le);
+			printf("Número de entradas: %d\n", le.numEntradas);
+			fflush(stdout);
+			eliminarEntrada(db, &le, dni);
+			sprintf(sendBuff, "Entrada eliminada correctamente");
+			send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+			break;
+		case '4':
+			printf("OPCION : %c\n", opcion);
+			fflush(stdout);
+			break;
 		}
-	} while (fin == 0);
+	} while (opcion != '4');
 
-	closesocket(comm_socket);
-	WSACleanup();
 
-	/*------------------------- END SOCKETS -------------------------------*/
+closesocket( comm_socket);
+WSACleanup();
 
-	return 0;
+/*------------------------- END SOCKETS -------------------------------*/
+
+return 0;
 }
 
