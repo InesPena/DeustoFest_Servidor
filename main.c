@@ -20,7 +20,14 @@ ListaEntradas lEntradas;
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
+	sqlite3_open("sqlite3/deustoFest.sqlite", &db);
+	pCart = &cart;
+	//menu(db, pCart, lEntradas);
+
+	/*-------------------------- SOCKETS----------------------------------*/
+
 	WSADATA wsaData;
 	SOCKET conn_socket; //el que lleva la conexion
 	SOCKET comm_socket; //el que lo comunica
@@ -29,10 +36,8 @@ int main(int argc, char *argv[]) {
 	char sendBuff[512], recvBuff[512]; // lo que yo envio, lo que yo recibo
 	sqlite3 *db;
 	char opcion, conCamping, conBus;
-	Cartelera cart;
 	int i, precio;
 	char dni[10], nom[20], email[50];
-	sqlite3_open("sqlite3/deustoFest.sqlite", &db);
 	ListaEntradas le;
 
 	printf("\nInitialising Winsock...\n"); // inicializa la libreria
@@ -91,16 +96,18 @@ int main(int argc, char *argv[]) {
 
 	// Closing the listening sockets (is not going to be used anymore)
 	closesocket(conn_socket);
-	int fin = 0;
 
 	do {
 		recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 		sscanf(recvBuff, "%c", &opcion);
+
 		switch (opcion) {
+
 		case '1':
 			obtenerCartelera(db, &cart);
 			sprintf(sendBuff, "%d", cart.numConciertos);
 			send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+
 			for (i = 0; i < cart.numConciertos; i++) {
 				sprintf(sendBuff, "%d;%s;%d;%d;%d", cart.conciertos[i].cod,
 						cart.conciertos[i].artista,
@@ -109,6 +116,7 @@ int main(int argc, char *argv[]) {
 				send(comm_socket, sendBuff, sizeof(sendBuff), 0);
 			}
 			break;
+
 		case '2':
 			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 			sscanf(recvBuff, "%c", &conCamping);
@@ -138,6 +146,7 @@ int main(int argc, char *argv[]) {
 			strcpy(pcl->mail, email);
 			insertCliente(db, pcl);
 			break;
+
 		case '3':
 			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 			sprintf(dni, "%s", recvBuff);
@@ -148,6 +157,7 @@ int main(int argc, char *argv[]) {
 			sprintf(sendBuff, "Entrada eliminada correctamente");
 			send(comm_socket, sendBuff, sizeof(sendBuff), 0);
 			break;
+
 		case '4':
 			printf("OPCION : %c\n", opcion);
 			fflush(stdout);
